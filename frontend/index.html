@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sistema de Asistencia | Punto de Marcación</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="kiosk-container">
+    <!-- Barra Superior: Fecha, Hora en vivo y Estado -->
+    <header class="kiosk-header">
+      <div class="header-brand">
+        <span class="live-dot"></span>
+        <span class="system-title">PUNTO DE ASISTENCIA</span>
+      </div>
+      <div class="clock-badge" id="liveClock">--:--:--</div>
+    </header>
+
+    <!-- Contenido Central -->
+    <main class="kiosk-main">
+      <!-- Tarjeta Principal de Marcación -->
+      <section class="attendance-card" id="cardContainer">
+        
+        <!-- Estado: Vista de Ingreso de DNI -->
+        <div class="card-view view-input" id="inputView">
+          <div class="badge-chip">Control de Ingreso</div>
+          <h1 class="card-title">Registra tu Asistencia</h1>
+          <p class="card-subtitle">Digita tu número de DNI y presiona <kbd class="kbd-key">Enter ↵</kbd></p>
+
+          <form id="attendanceForm" autocomplete="off" onsubmit="return false;">
+            <div class="input-wrapper" id="inputWrapper">
+              <span class="input-icon">🪪</span>
+              <input 
+                type="text" 
+                id="dniInput" 
+                class="dni-input" 
+                placeholder="________" 
+                maxlength="8" 
+                inputmode="numeric" 
+                pattern="[0-9]{8}"
+                autofocus 
+                required
+                aria-label="Número de DNI"
+              >
+            </div>
+          </form>
+
+          <!-- Indicador de carga -->
+          <div class="status-indicator loading-state hidden" id="loadingState">
+            <div class="spinner"></div>
+            <span class="status-text">Verificando identidad y registrando asistencia...</span>
+          </div>
+
+          <!-- Mensaje de error -->
+          <div class="status-indicator error-state hidden" id="errorState" role="alert">
+            <span class="error-icon">⚠️</span>
+            <div class="error-content">
+              <strong id="errorMessage">Error al registrar</strong>
+              <small id="errorDetail">Verifica el DNI e intenta de nuevo</small>
+            </div>
+          </div>
+        </div>
+
+        <!-- Estado: Mensaje Gigante de Éxito -->
+        <div class="card-view view-success hidden" id="successView">
+          <div class="success-icon-wrapper">
+            <div class="pulse-ring"></div>
+            <span class="success-emoji">✓</span>
+          </div>
+
+          <span class="success-tag">¡ASISTENCIA REGISTRADA!</span>
+          <h2 class="welcome-heading">¡Bienvenido(a)!</h2>
+          <div class="attendee-name" id="successAttendeeName">--</div>
+          
+          <div class="timestamp-pill">
+            <span class="pill-icon">🕒</span>
+            <span id="successTimestamp">--:--:--</span>
+          </div>
+
+          <!-- Barra de progreso regresiva de 3 segundos -->
+          <div class="countdown-bar-container">
+            <div class="countdown-bar" id="countdownBar"></div>
+          </div>
+        </div>
+
+      </section>
+    </main>
+
+    <!-- Pie de Pantalla -->
+    <footer class="kiosk-footer">
+      <span>Sistema Automatizado RENIEC &bull; MySQL 8.0</span>
+    </footer>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

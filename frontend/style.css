@@ -1,0 +1,449 @@
+/* =============================================================================
+   SISTEMA DE ASISTENCIA - ESTILOS KIOSKO MINIMALISTA & MODERNO
+   ============================================================================= */
+
+:root {
+  --bg-primary: #0a0e17;
+  --bg-surface: rgba(18, 24, 38, 0.75);
+  --bg-surface-border: rgba(255, 255, 255, 0.08);
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+  --accent-primary: #6366f1;
+  --accent-primary-hover: #4f46e5;
+  --accent-glow: rgba(99, 102, 241, 0.25);
+  --success-color: #10b981;
+  --success-glow: rgba(16, 185, 129, 0.35);
+  --error-color: #ef4444;
+  --error-bg: rgba(239, 68, 68, 0.12);
+  --error-border: rgba(239, 68, 68, 0.3);
+  --radius-xl: 24px;
+  --radius-md: 14px;
+  --transition-smooth: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  background-color: var(--bg-primary);
+  background-image: 
+    radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, rgba(16, 185, 129, 0.1) 0px, transparent 50%);
+  color: var(--text-main);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow-x: hidden;
+  user-select: none;
+}
+
+/* Contenedor Principal Kiosko */
+.kiosk-container {
+  width: 100%;
+  max-width: 720px;
+  min-height: 100vh;
+  padding: 32px 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+/* Cabecera */
+.kiosk-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 24px;
+}
+
+.header-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.live-dot {
+  width: 10px;
+  height: 10px;
+  background-color: var(--success-color);
+  border-radius: 50%;
+  box-shadow: 0 0 12px var(--success-color);
+  animation: pulse-dot 2s infinite;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.85); }
+}
+
+.system-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  color: var(--text-muted);
+}
+
+.clock-badge {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1rem;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--bg-surface-border);
+  padding: 6px 14px;
+  border-radius: 20px;
+  color: #cbd5e1;
+}
+
+/* Área Central */
+.kiosk-main {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 20px 0;
+}
+
+/* Tarjeta de Asistencia con Glassmorphism */
+.attendance-card {
+  width: 100%;
+  background: var(--bg-surface);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--bg-surface-border);
+  border-radius: var(--radius-xl);
+  padding: 48px 40px;
+  box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.6);
+  position: relative;
+  overflow: hidden;
+  transition: var(--transition-smooth);
+}
+
+/* Vistas de la tarjeta */
+.card-view {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.card-view.hidden {
+  display: none;
+  opacity: 0;
+  transform: scale(0.96);
+}
+
+/* Vista de Entrada de DNI */
+.badge-chip {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--accent-primary);
+  background: rgba(99, 102, 241, 0.12);
+  border: 1px solid rgba(99, 102, 241, 0.25);
+  padding: 4px 14px;
+  border-radius: 30px;
+  margin-bottom: 16px;
+}
+
+.card-title {
+  font-size: 2.2rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: #ffffff;
+  margin-bottom: 8px;
+}
+
+.card-subtitle {
+  font-size: 1rem;
+  color: var(--text-muted);
+  margin-bottom: 36px;
+}
+
+.kbd-key {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 0.9rem;
+  color: #e2e8f0;
+}
+
+/* Wrapper del Input */
+.input-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 440px;
+  display: flex;
+  align-items: center;
+  margin: 0 auto;
+}
+
+.input-icon {
+  position: absolute;
+  left: 20px;
+  font-size: 1.5rem;
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.dni-input {
+  width: 100%;
+  height: 72px;
+  padding: 0 24px 0 64px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: 0.25em;
+  text-align: center;
+  color: #ffffff;
+  background: rgba(15, 23, 42, 0.85);
+  border: 2px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--radius-md);
+  outline: none;
+  transition: var(--transition-smooth);
+}
+
+.dni-input::placeholder {
+  color: rgba(148, 163, 184, 0.25);
+  letter-spacing: 0.25em;
+}
+
+.dni-input:focus {
+  border-color: var(--accent-primary);
+  background: rgba(15, 23, 42, 0.98);
+  box-shadow: 0 0 0 5px var(--accent-glow);
+}
+
+.dni-input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  border-color: rgba(255, 255, 255, 0.05);
+}
+
+/* Indicadores de Estado */
+.status-indicator {
+  margin-top: 28px;
+  width: 100%;
+  max-width: 440px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 14px 20px;
+  border-radius: var(--radius-md);
+  animation: fadeIn 0.3s ease;
+}
+
+.status-indicator.hidden {
+  display: none;
+}
+
+/* Estado de Carga */
+.loading-state {
+  background: rgba(99, 102, 241, 0.08);
+  border: 1px solid rgba(99, 102, 241, 0.2);
+  color: #c7d2fe;
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.spinner {
+  width: 20px;
+  height: 20px;
+  border: 2.5px solid rgba(99, 102, 241, 0.3);
+  border-top-color: var(--accent-primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Estado de Error */
+.error-state {
+  background: var(--error-bg);
+  border: 1px solid var(--error-border);
+  color: #fca5a5;
+  text-align: left;
+  animation: shake 0.4s ease;
+}
+
+.error-icon {
+  font-size: 1.4rem;
+}
+
+.error-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.error-content strong {
+  font-size: 0.95rem;
+  color: #fee2e2;
+}
+
+.error-content small {
+  font-size: 0.8rem;
+  color: #fca5a5;
+  margin-top: 2px;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-8px); }
+  40%, 80% { transform: translateX(8px); }
+}
+
+/* Vista Gigante de Éxito */
+.view-success {
+  padding: 20px 0;
+  animation: zoomIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes zoomIn {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.success-icon-wrapper {
+  position: relative;
+  width: 88px;
+  height: 88px;
+  background: var(--success-color);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 35px var(--success-glow);
+  margin-bottom: 24px;
+}
+
+.pulse-ring {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  border: 2px solid var(--success-color);
+  animation: ring-pulse 1.8s ease-out infinite;
+}
+
+@keyframes ring-pulse {
+  0% { transform: scale(1); opacity: 0.8; }
+  100% { transform: scale(1.6); opacity: 0; }
+}
+
+.success-emoji {
+  font-size: 3rem;
+  font-weight: 800;
+  color: #ffffff;
+  line-height: 1;
+}
+
+.success-tag {
+  font-size: 0.85rem;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  color: var(--success-color);
+  margin-bottom: 8px;
+}
+
+.welcome-heading {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #94a3b8;
+  margin-bottom: 12px;
+}
+
+/* Nombre Gigante */
+.attendee-name {
+  font-size: 2.5rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: #ffffff;
+  max-width: 90%;
+  line-height: 1.2;
+  margin-bottom: 20px;
+  text-transform: uppercase;
+  text-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+}
+
+.timestamp-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 8px 18px;
+  border-radius: 30px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.95rem;
+  color: #cbd5e1;
+  margin-bottom: 32px;
+}
+
+/* Barra de cuenta regresiva de 3s */
+.countdown-bar-container {
+  width: 100%;
+  max-width: 320px;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.countdown-bar {
+  width: 100%;
+  height: 100%;
+  background: var(--success-color);
+  transform-origin: left;
+}
+
+.countdown-active {
+  animation: countdown 3s linear forwards;
+}
+
+@keyframes countdown {
+  from { transform: scaleX(1); }
+  to { transform: scaleX(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Pie de Página */
+.kiosk-footer {
+  text-align: center;
+  font-size: 0.8rem;
+  color: #475569;
+  letter-spacing: 0.05em;
+}
+
+/* Responsividad para móviles y pantallas táctiles */
+@media (max-width: 640px) {
+  .attendance-card {
+    padding: 32px 20px;
+  }
+  .card-title {
+    font-size: 1.75rem;
+  }
+  .dni-input {
+    font-size: 1.5rem;
+    height: 60px;
+    letter-spacing: 0.18em;
+  }
+  .attendee-name {
+    font-size: 1.8rem;
+  }
+}

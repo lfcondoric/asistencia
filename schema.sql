@@ -16,6 +16,7 @@ CREATE TABLE IF NOT EXISTS Asistente (
     Nombres VARCHAR(100) NOT NULL,
     Apellido_Paterno VARCHAR(100) NOT NULL,
     Apellido_Materno VARCHAR(100) NOT NULL,
+    celular VARCHAR(9) NULL,
     Fecha_Registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (DNI)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;

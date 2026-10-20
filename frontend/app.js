@@ -9,17 +9,22 @@ const API_URL = (window.location.port === '8000')
   : 'http://localhost:8000/api/asistencia';
 
 // Elementos del DOM
-const dniInput = document.getElementById('dniInput');
-const inputView = document.getElementById('inputView');
-const successView = document.getElementById('successView');
-const loadingState = document.getElementById('loadingState');
-const errorState = document.getElementById('errorState');
-const errorMessage = document.getElementById('errorMessage');
-const errorDetail = document.getElementById('errorDetail');
+const attendanceForm = document.getElementById('attendanceForm');
+const dniInput       = document.getElementById('dniInput');
+const celularInput   = document.getElementById('celularInput');
+const submitBtn      = document.getElementById('submitBtn');
+const inputView      = document.getElementById('inputView');
+const successView    = document.getElementById('successView');
+const loadingState   = document.getElementById('loadingState');
+const errorState     = document.getElementById('errorState');
+const errorMessage   = document.getElementById('errorMessage');
+const errorDetail    = document.getElementById('errorDetail');
 const successAttendeeName = document.getElementById('successAttendeeName');
-const successTimestamp = document.getElementById('successTimestamp');
-const countdownBar = document.getElementById('countdownBar');
-const liveClock = document.getElementById('liveClock');
+const successTimestamp    = document.getElementById('successTimestamp');
+const successCelular      = document.getElementById('successCelular');
+const celularPill         = document.getElementById('celularPill');
+const countdownBar        = document.getElementById('countdownBar');
+const liveClock           = document.getElementById('liveClock');
 
 let isSubmitting = false;
 let resetTimeout = null;
@@ -43,32 +48,49 @@ updateClock();
 // 2. Control de Foco y Validación de Entrada
 // =============================================================================
 function focusInput() {
-  if (!isSubmitting) {
+  if (!isSubmitting && successView.classList.contains('hidden')) {
     dniInput.focus();
   }
 }
 
-// Auto-enfoque al cargar la ventana
+// Auto-enfoque al cargar la página
 window.addEventListener('DOMContentLoaded', () => {
   focusInput();
 });
 
-// En modo kiosko, al hacer clic en cualquier parte de la pantalla se re-enfoca el input
-document.addEventListener('click', (e) => {
-  if (successView.classList.contains('hidden') && !isSubmitting) {
-    focusInput();
-  }
-});
-
-// Permitir únicamente dígitos numéricos en el input
-dniInput.addEventListener('input', (e) => {
-  // Limpiar caracteres no numéricos
+// Permitir únicamente dígitos numéricos en ambos inputs
+dniInput.addEventListener('input', () => {
   dniInput.value = dniInput.value.replace(/\D/g, '');
   hideError();
 });
 
-// Disparar el envío al presionar la tecla "Enter"
+celularInput.addEventListener('input', () => {
+  celularInput.value = celularInput.value.replace(/\D/g, '');
+  hideError();
+});
+
+// Envío a través del evento submit del formulario (cubre clics en el botón y Enter estándar)
+if (attendanceForm) {
+  attendanceForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    if (!isSubmitting) {
+      handleAttendanceSubmit();
+    }
+  });
+}
+
+// DNI: Enter envía la asistencia directamente (o valida y ejecuta)
 dniInput.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    if (!isSubmitting) {
+      handleAttendanceSubmit();
+    }
+  }
+});
+
+// Celular: Enter envía la asistencia
+celularInput.addEventListener('keydown', (e) => {
   if (e.key === 'Enter') {
     e.preventDefault();
     if (!isSubmitting) {
@@ -81,22 +103,33 @@ dniInput.addEventListener('keydown', (e) => {
 // 3. Envío Asíncrono de la Asistencia
 // =============================================================================
 async function handleAttendanceSubmit() {
-  const dni = dniInput.value.trim();
+  const dni     = dniInput.value.trim();
+  const celular = celularInput.value.trim();
 
-  // Validación rápida en frontend (exactamente 8 dígitos)
+  // Validar DNI
   if (!/^\d{8}$/.test(dni)) {
-    showError(
-      'DNI Inválido',
-      'El número debe contener exactamente 8 dígitos numéricos.'
-    );
-    playTone(150, 'sawtooth', 0.2); // Sonido sutil de error
+    showError('DNI Inválido', 'El número debe contener exactamente 8 dígitos numéricos.');
+    playTone(150, 'sawtooth', 0.2);
     dniInput.select();
+    dniInput.focus();
     return;
   }
 
-  // Activar estado de carga y desactivar input
+  // Validar celular solo si fue ingresado
+  if (celular && !/^9\d{8}$/.test(celular)) {
+    showError('Celular Inválido', 'El celular debe tener 9 dígitos y empezar con 9.');
+    playTone(150, 'sawtooth', 0.2);
+    celularInput.select();
+    celularInput.focus();
+    return;
+  }
+
   setLoading(true);
   hideError();
+
+  // Construir body: incluir celular solo si fue ingresado
+  const body = { dni };
+  if (celular) body.celular = celular;
 
   try {
     const response = await fetch(API_URL, {
@@ -105,7 +138,7 @@ async function handleAttendanceSubmit() {
         'Content-Type': 'application/json',
         'Accept': 'application/json'
       },
-      body: JSON.stringify({ dni: dni })
+      body: JSON.stringify(body)
     });
 
     const data = await response.json();
@@ -146,8 +179,12 @@ async function handleAttendanceSubmit() {
 // =============================================================================
 
 function setLoading(loading) {
-  isSubmitting = loading;
-  dniInput.disabled = loading;
+  isSubmitting          = loading;
+  dniInput.disabled     = loading;
+  celularInput.disabled = loading;
+  if (submitBtn) {
+    submitBtn.disabled  = loading;
+  }
 
   if (loading) {
     loadingState.classList.remove('hidden');
@@ -174,39 +211,45 @@ function hideError() {
 function showSuccess(attendeeData) {
   setLoading(false);
 
-  // Asignar los datos del asistente recibido de la BD/API
   successAttendeeName.textContent = attendeeData.nombre_completo || 'Asistente';
-  successTimestamp.textContent = attendeeData.fecha_hora || new Date().toLocaleTimeString();
+  successTimestamp.textContent    = attendeeData.fecha_hora || new Date().toLocaleTimeString();
 
-  // Ocultar vista de entrada y mostrar vista gigante de éxito
+  // Mostrar celular en pill solo si viene en la respuesta
+  if (attendeeData.celular) {
+    successCelular.textContent = attendeeData.celular;
+    celularPill.classList.remove('hidden');
+  } else {
+    celularPill.classList.add('hidden');
+  }
+
   inputView.classList.add('hidden');
   successView.classList.remove('hidden');
 
-  // Iniciar animación de la barra de progreso de 3 segundos
   countdownBar.classList.remove('countdown-active');
-  void countdownBar.offsetWidth; // Forzar reflow para reiniciar animación CSS
+  void countdownBar.offsetWidth;
   countdownBar.classList.add('countdown-active');
 
-  // Limpiar cualquier temporizador previo
   if (resetTimeout) clearTimeout(resetTimeout);
 
-  // Exactamente 3 segundos de visualización de éxito
   resetTimeout = setTimeout(() => {
     resetKiosk();
   }, 3000);
 }
 
 function resetKiosk() {
-  // Limpiar input y regresar a vista de entrada
-  dniInput.value = '';
-  dniInput.disabled = false;
+  dniInput.value        = '';
+  celularInput.value    = '';
+  dniInput.disabled     = false;
+  celularInput.disabled = false;
+  if (submitBtn) {
+    submitBtn.disabled  = false;
+  }
   isSubmitting = false;
 
   successView.classList.add('hidden');
   inputView.classList.remove('hidden');
   hideError();
 
-  // Auto-enfocar para el siguiente asistente
   focusInput();
 }
 

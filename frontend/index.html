@@ -29,24 +29,49 @@
         <div class="card-view view-input" id="inputView">
           <div class="badge-chip">Control de Ingreso</div>
           <h1 class="card-title">Registra tu Asistencia</h1>
-          <p class="card-subtitle">Digita tu número de DNI y presiona <kbd class="kbd-key">Enter ↵</kbd></p>
+          <p class="card-subtitle">Ingresa tu DNI y celular, luego presiona <kbd class="kbd-key">Enter ↵</kbd></p>
 
-          <form id="attendanceForm" autocomplete="off" onsubmit="return false;">
+          <form id="attendanceForm" autocomplete="off">
             <div class="input-wrapper" id="inputWrapper">
-              <span class="input-icon">🪪</span>
-              <input 
-                type="text" 
-                id="dniInput" 
-                class="dni-input" 
-                placeholder="________" 
-                maxlength="8" 
-                inputmode="numeric" 
-                pattern="[0-9]{8}"
-                autofocus 
-                required
-                aria-label="Número de DNI"
-              >
+              <label for="dniInput" class="input-label">DNI</label>
+              <div class="input-box">
+                <span class="input-icon">🪪</span>
+                <input 
+                  type="text" 
+                  id="dniInput" 
+                  class="dni-input" 
+                  placeholder="DNI (8 dígitos)" 
+                  maxlength="8" 
+                  inputmode="numeric" 
+                  pattern="[0-9]{8}"
+                  autofocus 
+                  required
+                  aria-label="Número de DNI"
+                >
+              </div>
             </div>
+
+            <div class="input-wrapper input-wrapper--secondary" id="celularWrapper">
+              <label for="celularInput" class="input-label">Celular (Opcional)</label>
+              <div class="input-box">
+                <span class="input-icon">📱</span>
+                <input 
+                  type="text" 
+                  id="celularInput" 
+                  class="dni-input" 
+                  placeholder="9XXXXXXXX (9 dígitos)" 
+                  maxlength="9" 
+                  inputmode="numeric" 
+                  pattern="9[0-9]{8}"
+                  aria-label="Número de celular"
+                >
+              </div>
+            </div>
+
+            <button type="submit" id="submitBtn" class="submit-btn">
+              <span>Registrar Asistencia</span>
+              <span class="btn-kbd">Enter ↵</span>
+            </button>
           </form>
 
           <!-- Indicador de carga -->
@@ -75,10 +100,16 @@
           <span class="success-tag">¡ASISTENCIA REGISTRADA!</span>
           <h2 class="welcome-heading">¡Bienvenido(a)!</h2>
           <div class="attendee-name" id="successAttendeeName">--</div>
-          
-          <div class="timestamp-pill">
-            <span class="pill-icon">🕒</span>
-            <span id="successTimestamp">--:--:--</span>
+
+          <div class="success-pills">
+            <div class="timestamp-pill">
+              <span class="pill-icon">🕒</span>
+              <span id="successTimestamp">--:--:--</span>
+            </div>
+            <div class="timestamp-pill celular-pill hidden" id="celularPill">
+              <span class="pill-icon">📱</span>
+              <span id="successCelular">--</span>
+            </div>
           </div>
 
           <!-- Barra de progreso regresiva de 3 segundos -->
@@ -96,6 +127,6 @@
     </footer>
   </div>
 
-  <script src="app.js"></script>
+  <script src="app.js?v=2"></script>
 </body>
 </html>

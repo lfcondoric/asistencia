@@ -177,56 +177,147 @@ body {
   color: #e2e8f0;
 }
 
-/* Wrapper del Input */
-.input-wrapper {
-  position: relative;
+/* Formulario y Wrappers */
+#attendanceForm {
   width: 100%;
   max-width: 440px;
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  gap: 16px;
   margin: 0 auto;
+}
+
+.input-wrapper {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  text-align: left;
+}
+
+.input-label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-left: 4px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.input-box {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
 }
 
 .input-icon {
   position: absolute;
   left: 20px;
-  font-size: 1.5rem;
-  opacity: 0.6;
+  font-size: 1.4rem;
+  opacity: 0.65;
   pointer-events: none;
+  z-index: 2;
 }
 
 .dni-input {
   width: 100%;
-  height: 72px;
-  padding: 0 24px 0 64px;
+  height: 66px;
+  padding: 0 24px 0 60px;
   font-family: 'JetBrains Mono', monospace;
-  font-size: 2rem;
+  font-size: 1.7rem;
   font-weight: 700;
-  letter-spacing: 0.25em;
+  letter-spacing: 0.2em;
   text-align: center;
   color: #ffffff;
   background: rgba(15, 23, 42, 0.85);
   border: 2px solid rgba(255, 255, 255, 0.12);
   border-radius: var(--radius-md);
   outline: none;
+  cursor: text;
+  user-select: text;
   transition: var(--transition-smooth);
 }
 
 .dni-input::placeholder {
-  color: rgba(148, 163, 184, 0.25);
-  letter-spacing: 0.25em;
+  color: rgba(148, 163, 184, 0.3);
+  letter-spacing: 0.1em;
+  font-size: 1.15rem;
 }
 
 .dni-input:focus {
   border-color: var(--accent-primary);
   background: rgba(15, 23, 42, 0.98);
-  box-shadow: 0 0 0 5px var(--accent-glow);
+  box-shadow: 0 0 0 4px var(--accent-glow);
 }
 
 .dni-input:disabled {
   opacity: 0.5;
   cursor: not-allowed;
   border-color: rgba(255, 255, 255, 0.05);
+}
+
+/* Campo de celular */
+.input-wrapper--secondary .dni-input {
+  font-size: 1.4rem;
+  letter-spacing: 0.15em;
+  height: 60px;
+}
+
+.input-wrapper--secondary .dni-input::placeholder {
+  letter-spacing: 0.05em;
+  font-size: 1rem;
+}
+
+/* Botón de Envío */
+.submit-btn {
+  margin-top: 6px;
+  width: 100%;
+  height: 56px;
+  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: var(--radius-md);
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  box-shadow: 0 8px 24px -4px rgba(99, 102, 241, 0.45);
+  transition: var(--transition-smooth);
+}
+
+.submit-btn:hover {
+  background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 12px 28px -4px rgba(99, 102, 241, 0.6);
+}
+
+.submit-btn:active {
+  transform: translateY(1px);
+}
+
+.submit-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.btn-kbd {
+  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #e2e8f0;
 }
 
 /* Indicadores de Estado */
@@ -388,7 +479,26 @@ body {
   font-family: 'JetBrains Mono', monospace;
   font-size: 0.95rem;
   color: #cbd5e1;
+}
+
+/* Contenedor de pills en fila (hora + celular) */
+.success-pills {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
   margin-bottom: 32px;
+}
+
+.celular-pill {
+  background: rgba(99, 102, 241, 0.1);
+  border-color: rgba(99, 102, 241, 0.3);
+  color: #c7d2fe;
+}
+
+.celular-pill.hidden {
+  display: none;
 }
 
 /* Barra de cuenta regresiva de 3s */

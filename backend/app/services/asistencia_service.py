@@ -14,12 +14,12 @@ class AsistenciaService:
     def buscar_asistente_local(dni: str) -> Optional[Dict[str, Any]]:
         """
         Consulta directa con SELECT en la tabla Asistente para verificar si el DNI existe.
-        Retorna el registro completo (incluyendo celular) o None si no existe.
+        Retorna el registro completo (incluyendo celular y fecha de nacimiento) o None si no existe.
         """
         try:
             with get_db_cursor() as cursor:
                 query = """
-                    SELECT DNI, Nombres, Apellido_Paterno, Apellido_Materno, celular
+                    SELECT DNI, Nombres, Apellido_Paterno, Apellido_Materno, celular, Fecha_Nacimiento
                     FROM Asistente
                     WHERE DNI = %s
                 """
@@ -33,12 +33,17 @@ class AsistenciaService:
             )
 
     @classmethod
-    async def procesar_asistencia(cls, dni: str, celular: Optional[str] = None) -> Dict[str, Any]:
+    async def procesar_asistencia(
+        cls, 
+        dni: str, 
+        celular: Optional[str] = None, 
+        fecha_nacimiento: Optional[str] = None
+    ) -> Dict[str, Any]:
         """
         Orquesta el registro de asistencia mediante consultas SQL directas:
         1. SELECT en 'Asistente' para verificar si el DNI ya existe.
-        2. Si no existe: consulta RENIEC e INSERT en 'Asistente' con celular opcional.
-        3. Si ya existe y se envió un celular distinto, lo actualiza con UPDATE.
+        2. Si no existe: consulta RENIEC e INSERT en 'Asistente' con celular y fecha de nacimiento opcionales.
+        3. Si ya existe y se envió celular o fecha de nacimiento distinta, los actualiza con UPDATE.
         4. INSERT en 'Registro_Asistencia' con el DNI y timestamp.
         5. Retorna el resultado estructurado para la respuesta JSON.
         """
@@ -58,32 +63,47 @@ class AsistenciaService:
 
                     cursor.execute(
                         """
-                        INSERT INTO Asistente (DNI, Nombres, Apellido_Paterno, Apellido_Materno, celular)
-                        VALUES (%s, %s, %s, %s, %s)
+                        INSERT INTO Asistente (DNI, Nombres, Apellido_Paterno, Apellido_Materno, celular, Fecha_Nacimiento)
+                        VALUES (%s, %s, %s, %s, %s, %s)
                         """,
-                        (dni, nombres, apellido_paterno, apellido_materno, celular)
+                        (dni, nombres, apellido_paterno, apellido_materno, celular, fecha_nacimiento)
                     )
                     es_nuevo_registro = True
                     celular_guardado = celular
+                    fecha_nacimiento_guardada = fecha_nacimiento
                     logger.info(f"Nuevo asistente insertado: {dni} - {nombres} {apellido_paterno}")
 
                 else:
-                    # ── DNI existente: recuperar datos y actualizar celular si viene uno nuevo ─
+                    # ── DNI existente: recuperar datos y actualizar celular/fecha si vienen nuevos ─
                     nombres = asistente["Nombres"]
                     apellido_paterno = asistente["Apellido_Paterno"]
                     apellido_materno = asistente["Apellido_Materno"]
                     celular_guardado = asistente.get("celular")
+                    fn_actual = asistente.get("Fecha_Nacimiento")
+                    fecha_nacimiento_guardada = str(fn_actual) if fn_actual else None
 
-                    # Guardar celular si se envió uno Y es distinto al que ya hay (o no había ninguno)
+                    updates = []
+                    params = []
+
+                    # Actualizar celular si se envió uno y es distinto
                     if celular and celular != celular_guardado:
-                        cursor.execute(
-                            "UPDATE Asistente SET celular = %s WHERE DNI = %s",
-                            (celular, dni)
-                        )
+                        updates.append("celular = %s")
+                        params.append(celular)
                         celular_guardado = celular
-                        logger.info(f"Celular guardado/actualizado para DNI {dni}: {celular}")
+
+                    # Actualizar fecha de nacimiento si se envió una y es distinta
+                    if fecha_nacimiento and fecha_nacimiento != fecha_nacimiento_guardada:
+                        updates.append("Fecha_Nacimiento = %s")
+                        params.append(fecha_nacimiento)
+                        fecha_nacimiento_guardada = fecha_nacimiento
+
+                    if updates:
+                        params.append(dni)
+                        sql_update = f"UPDATE Asistente SET {', '.join(updates)} WHERE DNI = %s"
+                        cursor.execute(sql_update, tuple(params))
+                        logger.info(f"Datos actualizados para DNI {dni}: celular={celular_guardado}, fecha_nacimiento={fecha_nacimiento_guardada}")
                     else:
-                        logger.info(f"Asistente existente en BD: {dni} - {nombres} {apellido_paterno} (celular: {celular_guardado or 'sin registrar'})")
+                        logger.info(f"Asistente existente en BD: {dni} - {nombres} {apellido_paterno}")
 
                 # ── Registrar asistencia ─────────────────────────────────────────────
                 fecha_hora_actual = datetime.now()
@@ -100,6 +120,7 @@ class AsistenciaService:
                 "dni": dni,
                 "nombre_completo": nombre_completo,
                 "celular": celular_guardado,
+                "fecha_nacimiento": str(fecha_nacimiento_guardada) if fecha_nacimiento_guardada else None,
                 "fecha_hora": fecha_hora_actual.strftime("%Y-%m-%d %H:%M:%S"),
                 "es_nuevo_registro": es_nuevo_registro,
             }

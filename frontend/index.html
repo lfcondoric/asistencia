@@ -29,7 +29,7 @@
         <div class="card-view view-input" id="inputView">
           <div class="badge-chip">Control de Ingreso</div>
           <h1 class="card-title">Registra tu Asistencia</h1>
-          <p class="card-subtitle">Ingresa tu DNI y celular, luego presiona <kbd class="kbd-key">Enter ↵</kbd></p>
+          <p class="card-subtitle">Ingresa tu DNI y datos opcionales, luego presiona <kbd class="kbd-key">Enter ↵</kbd></p>
 
           <form id="attendanceForm" autocomplete="off">
             <div class="input-wrapper" id="inputWrapper">
@@ -64,6 +64,19 @@
                   inputmode="numeric" 
                   pattern="9[0-9]{8}"
                   aria-label="Número de celular"
+                >
+              </div>
+            </div>
+
+            <div class="input-wrapper input-wrapper--secondary" id="nacimientoWrapper">
+              <label for="nacimientoInput" class="input-label">Fecha de Nacimiento (Opcional)</label>
+              <div class="input-box">
+                <span class="input-icon">🎂</span>
+                <input 
+                  type="date" 
+                  id="nacimientoInput" 
+                  class="dni-input date-input" 
+                  aria-label="Fecha de nacimiento"
                 >
               </div>
             </div>
@@ -110,6 +123,10 @@
               <span class="pill-icon">📱</span>
               <span id="successCelular">--</span>
             </div>
+            <div class="timestamp-pill nac-pill hidden" id="nacPill">
+              <span class="pill-icon">🎂</span>
+              <span id="successNac">--</span>
+            </div>
           </div>
 
           <!-- Barra de progreso regresiva de 3 segundos -->
@@ -127,6 +144,6 @@
     </footer>
   </div>
 
-  <script src="app.js?v=2"></script>
+  <script src="app.js?v=3"></script>
 </body>
 </html>

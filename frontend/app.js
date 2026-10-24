@@ -12,6 +12,7 @@ const API_URL = (window.location.port === '8000')
 const attendanceForm = document.getElementById('attendanceForm');
 const dniInput       = document.getElementById('dniInput');
 const celularInput   = document.getElementById('celularInput');
+const nacimientoInput = document.getElementById('nacimientoInput');
 const submitBtn      = document.getElementById('submitBtn');
 const inputView      = document.getElementById('inputView');
 const successView    = document.getElementById('successView');
@@ -23,6 +24,8 @@ const successAttendeeName = document.getElementById('successAttendeeName');
 const successTimestamp    = document.getElementById('successTimestamp');
 const successCelular      = document.getElementById('successCelular');
 const celularPill         = document.getElementById('celularPill');
+const successNac          = document.getElementById('successNac');
+const nacPill             = document.getElementById('nacPill');
 const countdownBar        = document.getElementById('countdownBar');
 const liveClock           = document.getElementById('liveClock');
 
@@ -99,12 +102,28 @@ celularInput.addEventListener('keydown', (e) => {
   }
 });
 
+// Fecha de Nacimiento: Enter envía la asistencia y change limpia errores
+if (nacimientoInput) {
+  nacimientoInput.addEventListener('change', () => {
+    hideError();
+  });
+  nacimientoInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      if (!isSubmitting) {
+        handleAttendanceSubmit();
+      }
+    }
+  });
+}
+
 // =============================================================================
 // 3. Envío Asíncrono de la Asistencia
 // =============================================================================
 async function handleAttendanceSubmit() {
-  const dni     = dniInput.value.trim();
-  const celular = celularInput.value.trim();
+  const dni             = dniInput.value.trim();
+  const celular         = celularInput.value.trim();
+  const fechaNacimiento = nacimientoInput ? nacimientoInput.value.trim() : '';
 
   // Validar DNI
   if (!/^\d{8}$/.test(dni)) {
@@ -124,12 +143,39 @@ async function handleAttendanceSubmit() {
     return;
   }
 
+  // Validar fecha de nacimiento solo si fue ingresada
+  if (fechaNacimiento) {
+    const selectedDate = new Date(fechaNacimiento + 'T00:00:00');
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    if (isNaN(selectedDate.getTime())) {
+      showError('Fecha Inválida', 'La fecha de nacimiento no es válida.');
+      playTone(150, 'sawtooth', 0.2);
+      if (nacimientoInput) nacimientoInput.focus();
+      return;
+    }
+    if (selectedDate > today) {
+      showError('Fecha Inválida', 'La fecha de nacimiento no puede ser una fecha futura.');
+      playTone(150, 'sawtooth', 0.2);
+      if (nacimientoInput) nacimientoInput.focus();
+      return;
+    }
+    if (selectedDate.getFullYear() < 1900) {
+      showError('Fecha Inválida', 'El año de nacimiento debe ser mayor a 1900.');
+      playTone(150, 'sawtooth', 0.2);
+      if (nacimientoInput) nacimientoInput.focus();
+      return;
+    }
+  }
+
   setLoading(true);
   hideError();
 
-  // Construir body: incluir celular solo si fue ingresado
+  // Construir body: incluir campos opcionales solo si fueron ingresados
   const body = { dni };
   if (celular) body.celular = celular;
+  if (fechaNacimiento) body.fecha_nacimiento = fechaNacimiento;
 
   try {
     const response = await fetch(API_URL, {
@@ -182,6 +228,9 @@ function setLoading(loading) {
   isSubmitting          = loading;
   dniInput.disabled     = loading;
   celularInput.disabled = loading;
+  if (nacimientoInput) {
+    nacimientoInput.disabled = loading;
+  }
   if (submitBtn) {
     submitBtn.disabled  = loading;
   }
@@ -222,6 +271,18 @@ function showSuccess(attendeeData) {
     celularPill.classList.add('hidden');
   }
 
+  // Mostrar fecha de nacimiento en pill solo si viene en la respuesta
+  if (attendeeData.fecha_nacimiento && successNac && nacPill) {
+    const parts = attendeeData.fecha_nacimiento.split('-');
+    const formattedDate = (parts.length === 3) 
+      ? `${parts[2]}/${parts[1]}/${parts[0]}` 
+      : attendeeData.fecha_nacimiento;
+    successNac.textContent = formattedDate;
+    nacPill.classList.remove('hidden');
+  } else if (nacPill) {
+    nacPill.classList.add('hidden');
+  }
+
   inputView.classList.add('hidden');
   successView.classList.remove('hidden');
 
@@ -239,6 +300,10 @@ function showSuccess(attendeeData) {
 function resetKiosk() {
   dniInput.value        = '';
   celularInput.value    = '';
+  if (nacimientoInput) {
+    nacimientoInput.value = '';
+    nacimientoInput.disabled = false;
+  }
   dniInput.disabled     = false;
   celularInput.disabled = false;
   if (submitBtn) {

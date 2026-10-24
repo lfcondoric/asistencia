@@ -259,7 +259,7 @@ body {
   border-color: rgba(255, 255, 255, 0.05);
 }
 
-/* Campo de celular */
+/* Campo de celular y fecha */
 .input-wrapper--secondary .dni-input {
   font-size: 1.4rem;
   letter-spacing: 0.15em;
@@ -269,6 +269,26 @@ body {
 .input-wrapper--secondary .dni-input::placeholder {
   letter-spacing: 0.05em;
   font-size: 1rem;
+}
+
+.date-input {
+  color-scheme: dark;
+  font-size: 1.15rem !important;
+  letter-spacing: 0.05em !important;
+  padding-right: 18px;
+  cursor: pointer;
+}
+
+.date-input::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  filter: invert(0.85);
+  opacity: 0.75;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.date-input::-webkit-calendar-picker-indicator:hover {
+  opacity: 1;
+  transform: scale(1.1);
 }
 
 /* Botón de Envío */
@@ -498,6 +518,16 @@ body {
 }
 
 .celular-pill.hidden {
+  display: none;
+}
+
+.nac-pill {
+  background: rgba(245, 158, 11, 0.12);
+  border-color: rgba(245, 158, 11, 0.35);
+  color: #fde68a;
+}
+
+.nac-pill.hidden {
   display: none;
 }
 

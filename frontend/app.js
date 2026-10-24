@@ -3,10 +3,10 @@
  * Manejo de eventos de teclado, peticiones asíncronas y transiciones de estado.
  */
 
-// Configuración de la API: usa localhost:8000 por defecto si se abre como archivo o puerto distinto
-const API_URL = (window.location.port === '8000') 
-  ? '/api/asistencia' 
-  : 'http://localhost:8000/api/asistencia';
+// Configuración de la API: usa ruta relativa en servidores (Vercel o local) y localhost si se abre como archivo local
+const API_URL = (window.location.protocol === 'file:') 
+  ? 'http://localhost:8000/api/asistencia' 
+  : '/api/asistencia';
 
 // Elementos del DOM
 const attendanceForm = document.getElementById('attendanceForm');

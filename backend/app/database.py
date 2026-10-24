@@ -11,17 +11,21 @@ logger = logging.getLogger(__name__)
 def get_db_connection() -> pymysql.Connection:
     """Crea y retorna una conexión directa a MySQL usando PyMySQL."""
     try:
-        connection = pymysql.connect(
-            host=settings.DB_HOST,
-            port=settings.DB_PORT,
-            user=settings.DB_USER,
-            password=settings.DB_PASSWORD,
-            database=settings.DB_NAME,
-            charset="utf8mb4",
-            cursorclass=DictCursor,
-            autocommit=True,
-            connect_timeout=5,
-        )
+        connect_kwargs = {
+            "host": settings.DB_HOST,
+            "port": settings.DB_PORT,
+            "user": settings.DB_USER,
+            "password": settings.DB_PASSWORD,
+            "database": settings.DB_NAME,
+            "charset": "utf8mb4",
+            "cursorclass": DictCursor,
+            "autocommit": True,
+            "connect_timeout": 5,
+        }
+        if settings.DB_SSL:
+            connect_kwargs["ssl"] = {"ssl_mode": "REQUIRED"}
+
+        connection = pymysql.connect(**connect_kwargs)
         return connection
     except pymysql.MySQLError as e:
         logger.error(f"Error de conexión a la base de datos MySQL: {e}")

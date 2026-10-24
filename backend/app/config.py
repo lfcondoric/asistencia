@@ -11,6 +11,7 @@ class Settings(BaseSettings):
     DB_USER: str = Field(default="root")
     DB_PASSWORD: str = Field(default="root")
     DB_NAME: str = Field(default="db_asistencia")
+    DB_SSL: bool = Field(default=False)
 
     # API Externa DNI
     DNI_API_BASE_URL: str = Field(default="https://api.ejemplo.com/dni?numero=")
